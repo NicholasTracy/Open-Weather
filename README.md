@@ -1,4 +1,6 @@
-![Open-weather Logo](openweather_logo.png)
+<p align="center">
+  <img src="openweather_logo.png" alt="Open-Weather Logo"/>
+</p>
 
 ---
 
@@ -28,7 +30,3 @@ I expect to have a functional prototype and software to prove the concept and de
 A lot of the development will depend on others and how my schedule goes with other paid work.
 
 ---
-
-<p align="center">
-  <img />
-</p>
