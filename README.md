@@ -9,7 +9,12 @@ TODO
  * Create modules that can be built on to the base controller that add functionality useful for sensing weather.
  * Establish a standard for all hardware, software, communication protocols, and design practices. 
  * Prototype and proof of concept for base controller and a few simple modules. 
- 
+---
+### Filament Database
+
+This is a link to a Google spreadsheet of different filaments and their properties. Use this as a guid for selecting an appropriate filament for printing outdoor parts. Please follow  for information on adding to the list.
+[Spreadsheet](https://docs.google.com/spreadsheets/d/1O-heHT2M7XdvT4qFRkZZBCX_Tv8IUrr2iZ7YO4e-dkw/edit?usp=sharing)
+
 ---
 This is a work in progress, expect a lot to change. this is also not a priority project and may take some time between commits.
 I expect to have a functional prototype and software to prove the concept and demonstrate its use before the end of 2018. 
