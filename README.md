@@ -1,4 +1,4 @@
-![Open-weather Logo](https://NicholasTracy.github.com/Open-Weather/openweather_logo.png)
+![Open-weather Logo](openweather_logo.png)
 
 ---
 
