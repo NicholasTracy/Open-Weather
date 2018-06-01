@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="openweather_logo.png" alt="Open-Weather Logo"/>
+  <img src="Media/img/openweather_logo.png" alt="Open-Weather Logo"/>
 </p>
 
 ---
