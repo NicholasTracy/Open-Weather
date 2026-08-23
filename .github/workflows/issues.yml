@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Label new issues
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const labels = new Set(context.payload.issue.labels.map((label) => label.name))
