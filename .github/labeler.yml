@@ -1,0 +1,23 @@
+software:
+  - changed-files:
+      - any-glob-to-any-file: software/**
+
+hardware:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "3D Printed Parts/**"
+          - Boards/**
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - README.md
+          - CONTRIBUTING.md
+          - TROUBLESHOOTING.md
+          - index.html
+          - _config.yml
+          - Media/**
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: .github/**

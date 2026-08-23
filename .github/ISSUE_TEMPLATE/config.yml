@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Troubleshooting
+    url: https://github.com/NicholasTracy/Open-Weather/blob/master/TROUBLESHOOTING.md
+    about: Try common fixes before opening an issue
+  - name: Wiki
+    url: https://github.com/NicholasTracy/Open-Weather/wiki
+    about: Guides for running, building, and contributing
+  - name: Project site
+    url: https://nicholastracy.github.io/Open-Weather/
+    about: What Open Weather is and how it stays local-first

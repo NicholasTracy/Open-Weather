@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest an improvement for the app, station, or docs
+title: "[Idea]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Tell us the problem first, then the idea. Keep it concrete.
+  - type: dropdown
+    id: area
+    attributes:
+      label: What would this help?
+      options:
+        - Command Center app
+        - Station hardware
+        - Firmware
+        - Sharing or mesh network
+        - Docs or website
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: extras
+    attributes:
+      label: Extra context
+      description: Sketches, links, or how you would use it.

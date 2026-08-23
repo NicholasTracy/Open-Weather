@@ -1,0 +1,32 @@
+name: Hardware or print file
+description: Parts, 3D prints, boards, or firmware for a home station
+title: "[Hardware]: "
+labels: ["hardware", "needs-triage"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of hardware note is this?
+      options:
+        - 3D print / enclosure
+        - Sensor or board
+        - Firmware
+        - Build help
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What you are building, what failed, and any part numbers or print settings.
+    validations:
+      required: true
+  - type: textarea
+    id: materials
+    attributes:
+      label: Materials and tools
+      description: Filament, printer, sensors, or firmware board if you know them.
+  - type: markdown
+    attributes:
+      value: Outdoor print notes also live in [Issue #1](https://github.com/NicholasTracy/Open-Weather/issues/1) and the [filament spreadsheet](https://docs.google.com/spreadsheets/d/1O-heHT2M7XdvT4qFRkZZBCX_Tv8IUrr2iZ7YO4e-dkw/edit?usp=sharing).

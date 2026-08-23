@@ -1,0 +1,59 @@
+name: Bug report
+description: Something in the app, installer, or station workflow is broken
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Check [Troubleshooting](https://github.com/NicholasTracy/Open-Weather/blob/master/TROUBLESHOOTING.md) first if the app will not start or radar is empty.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did this happen?
+      options:
+        - Command Center app
+        - Windows installer
+        - Radar or satellite
+        - Alerts or 10-day outlook
+        - Hardware or firmware
+        - Website or docs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version or commit
+      placeholder: "0.1.0 or a git commit"
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Windows 11, macOS 15, Ubuntu 24.04"
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I looked through existing issues
+          required: true
+        - label: I checked the troubleshooting guide
+          required: true
