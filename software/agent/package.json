@@ -1,0 +1,15 @@
+{
+  "name": "open-weather-agent-mcp",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Cursor MCP bridge for Open Weather Command Center",
+  "main": "mcp-server.mjs",
+  "scripts": {
+    "start": "node ./mcp-server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  }
+}

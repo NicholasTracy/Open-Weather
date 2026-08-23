@@ -1,0 +1,126 @@
+:root {
+  --ow-bg: #141210;
+  --ow-card: #000000;
+  --ow-surface: #1c1a16;
+  --ow-surface-raised: #26231d;
+  --ow-border: #3f3a32;
+  --ow-border-strong: #5c564b;
+  --ow-text: #f3eee4;
+  --ow-text-muted: #c9c0b0;
+  --ow-accent: #e8b44c;
+  --ow-accent-strong: #c9922e;
+  --ow-accent-ink: #1c1608;
+  --ow-ok: #7cbc6a;
+  --ow-warn: #e0a14a;
+  --ow-danger: #e06a5c;
+  --ow-focus: color-mix(in srgb, var(--ow-accent) 38%, transparent);
+  --ow-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.55),
+    0 18px 36px rgba(0, 0, 0, 0.38);
+  --ow-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.38);
+  --ow-shadow-pop:
+    0 10px 22px rgba(0, 0, 0, 0.62),
+    0 24px 48px rgba(0, 0, 0, 0.42);
+  --ow-shadow-inset:
+    inset 0 2px 6px rgba(0, 0, 0, 0.48),
+    inset 0 1px 1px rgba(0, 0, 0, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  --ow-radius: 7px;
+  --ow-font: "Segoe UI", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --ow-mono: "Cascadia Mono", "IBM Plex Mono", Consolas, monospace;
+
+  color-scheme: dark;
+  font-family: var(--ow-font);
+  background: var(--ow-bg);
+  color: var(--ow-text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  min-height: 100%;
+  background: var(--ow-bg);
+  color: var(--ow-text);
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--ow-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #f3cc78;
+}
+
+[data-theme="light"] {
+  --ow-bg: #ebe4d4;
+  --ow-card: #fffaf0;
+  --ow-surface: #f7f1e4;
+  --ow-surface-raised: #fffaf0;
+  --ow-border: #cfc4ae;
+  --ow-border-strong: #b3a68c;
+  --ow-text: #1c1914;
+  --ow-text-muted: #5c564b;
+  --ow-accent: #8a5a10;
+  --ow-accent-strong: #6e470c;
+  --ow-accent-ink: #1c1608;
+  --ow-ok: #2f7a3e;
+  --ow-warn: #9a6414;
+  --ow-danger: #b44538;
+  --ow-shadow: 0 8px 22px rgba(28, 25, 20, 0.18), 0 18px 36px rgba(28, 25, 20, 0.12);
+  --ow-shadow-soft: 0 3px 10px rgba(28, 25, 20, 0.12);
+  --ow-shadow-pop: 0 10px 24px rgba(28, 25, 20, 0.16), 0 22px 48px rgba(28, 25, 20, 0.1);
+  --ow-shadow-inset:
+    inset 0 2px 5px rgba(28, 25, 20, 0.28),
+    inset 0 1px 1px rgba(28, 25, 20, 0.18);
+  color-scheme: light;
+}
+
+[data-theme="light"] a:hover {
+  color: #7a4e10;
+}
+
+.btn-ow-primary {
+  --bs-btn-color: #1c1608;
+  --bs-btn-bg: #e8b44c;
+  --bs-btn-border-color: #c9922e;
+  --bs-btn-hover-color: #1c1608;
+  --bs-btn-hover-bg: #f0c56a;
+  --bs-btn-hover-border-color: #c9922e;
+  --bs-btn-active-color: #1c1608;
+  --bs-btn-active-bg: #d4a03c;
+  --bs-btn-active-border-color: #c9922e;
+  --bs-btn-box-shadow: var(--ow-shadow-inset);
+  --bs-btn-hover-box-shadow: var(--ow-shadow-inset);
+  --bs-btn-active-shadow: var(--ow-shadow-inset);
+  --bs-btn-focus-box-shadow: var(--ow-shadow-inset);
+  font-weight: 700;
+  box-shadow: var(--ow-shadow-inset) !important;
+}
+
+.btn-ow-ghost {
+  --bs-btn-color: var(--ow-text);
+  --bs-btn-bg: var(--ow-surface-raised);
+  --bs-btn-border-color: var(--ow-border-strong);
+  --bs-btn-hover-color: var(--ow-text);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--ow-accent) 16%, var(--ow-surface-raised));
+  --bs-btn-hover-border-color: var(--ow-accent);
+  box-shadow: none;
+}
+
+.btn-ow-ghost.btn-ow-primary,
+.radar-toolbar__group .btn-ow-primary {
+  --bs-btn-color: #1c1608;
+  box-shadow: var(--ow-shadow-inset) !important;
+}

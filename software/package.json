@@ -1,0 +1,95 @@
+{
+  "name": "open-weather-command-center",
+  "version": "0.1.0",
+  "description": "Open Weather Station Command Center — cross-platform Electron dashboard",
+  "main": "./out/main/index.js",
+  "author": "Nicholas Tracy",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/NicholasTracy/Open-Weather",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "dev:agent": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win nsis --x64",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "agent:mcp": "node ./agent/mcp-server.mjs"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.7",
+    "leaflet": "^1.9.4",
+    "nexrad-level-2-data": "^3.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-leaflet": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^3.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "build": {
+    "appId": "com.openweather.commandcenter",
+    "productName": "Open Weather Command Center",
+    "directories": {
+      "output": "release",
+      "buildResources": "resources"
+    },
+    "files": [
+      "out/**/*",
+      "resources/**/*"
+    ],
+    "asarUnpack": [
+      "node_modules/@foxglove/wasm-bz2/**",
+      "node_modules/nexrad-level-2-data/**"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.weather"
+    },
+    "win": {
+      "icon": "icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName} ${version} Setup.${ext}",
+      "signAndEditExecutable": true,
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Open Weather",
+      "uninstallDisplayName": "Open Weather Command Center",
+      "deleteAppDataOnUninstall": false,
+      "license": "../LICENSE"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Science"
+    }
+  }
+}
