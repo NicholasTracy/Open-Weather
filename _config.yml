@@ -1,1 +1,11 @@
-theme: jekyll-theme-tactile
+title: Open Weather
+description: Your weather. Your station. Your computer. Free, open source, and built to work even when the internet does not.
+url: https://nicholastracy.github.io
+baseurl: /Open-Weather
+exclude:
+  - software
+  - Boards
+  - 3D Printed Parts
+  - README.md
+  - LICENSE
+  - .cursor

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open Weather</title>
+    <meta
+      name="description"
+      content="Your weather. Your station. Your computer. Free, open source, and built to work even when the internet does not."
+    />
+    <link rel="icon" href="Media/img/openweather_logo.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --bg: #141210;
+        --card: #1c1a16;
+        --border: #3f3a32;
+        --text: #f3eee4;
+        --muted: #c9c0b0;
+        --accent: #e8b44c;
+        --accent-strong: #c9922e;
+        --shadow: 0 8px 18px rgba(0, 0, 0, 0.55), 0 18px 36px rgba(0, 0, 0, 0.38);
+        --font: "Segoe UI", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        line-height: 1.6;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #f3cc78;
+      }
+
+      .wrap {
+        width: min(860px, calc(100% - 2.5rem));
+        margin: 0 auto;
+        padding: 2.4rem 0 4rem;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 3rem;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: inherit;
+      }
+
+      .brand img {
+        width: 44px;
+        height: 44px;
+      }
+
+      .brand strong {
+        font-size: 1.15rem;
+        letter-spacing: 0.02em;
+      }
+
+      .hero {
+        text-align: center;
+        padding: 1.2rem 0 2.4rem;
+      }
+
+      .hero img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 1.1rem;
+      }
+
+      h1 {
+        margin: 0 0 0.7rem;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.1;
+        font-weight: 700;
+      }
+
+      .lede {
+        margin: 0 auto 1.6rem;
+        max-width: 36rem;
+        color: var(--muted);
+        font-size: 1.15rem;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 0.7rem 1.15rem;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        box-shadow: var(--shadow);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent-strong);
+        color: #1c1608;
+        font-weight: 650;
+      }
+
+      .btn-primary:hover {
+        color: #1c1608;
+        background: #f3cc78;
+      }
+
+      section {
+        margin: 2.6rem 0;
+      }
+
+      h2 {
+        margin: 0 0 0.8rem;
+        font-size: 1.45rem;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+      }
+
+      ul {
+        padding-left: 1.2rem;
+      }
+
+      li + li {
+        margin-top: 0.35rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 0.85rem;
+      }
+
+      @media (min-width: 700px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 1rem 1.1rem;
+        box-shadow: var(--shadow);
+      }
+
+      .card strong {
+        display: block;
+        color: var(--text);
+        margin-bottom: 0.3rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 0.75rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--text);
+        font-weight: 650;
+        background: #26231d;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      footer {
+        margin-top: 3.2rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="./">
+          <img src="Media/img/openweather_logo.svg" alt="" />
+          <strong>Open Weather</strong>
+        </a>
+        <a href="https://github.com/NicholasTracy/Open-Weather">GitHub</a>
+      </header>
+
+      <div class="hero">
+        <img src="Media/img/openweather_logo.svg" alt="Open Weather" />
+        <h1>Your weather. Your station. Your computer.</h1>
+        <p class="lede">
+          Free, open source, and built to work even when the internet does not. No cloud. No account. No
+          subscription.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/NicholasTracy/Open-Weather">View the project</a>
+          <a class="btn" href="https://github.com/NicholasTracy/Open-Weather/tree/master/software">Get the Command Center</a>
+        </div>
+      </div>
+
+      <section>
+        <h2>Why this exists</h2>
+        <p>
+          Most weather apps lock you into a service. Open Weather is the other path: self-reliance. Build a
+          station from parts you can buy and print, run the software on your own computer, and keep a live
+          picture of the weather right where you are.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Build it yourself</strong>
+            Stations from common hardware, 3D-printed parts, and open firmware.
+          </div>
+          <div class="card">
+            <strong>Keep it local</strong>
+            Readings stay on your machine. There is no Open Weather server.
+          </div>
+          <div class="card">
+            <strong>Stay useful offline</strong>
+            Monitor hyper-local weather with no connection.
+          </div>
+          <div class="card">
+            <strong>Use the public record</strong>
+            When the internet is up, fill in radar, satellite, alerts, and a 10-day outlook from free sources.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>What you get today</h2>
+        <p>
+          The Command Center is the desktop app for Windows, macOS, and Linux. Connect a home station when you
+          have one. Until then, the map and outlook still work from public sources.
+        </p>
+        <ul>
+          <li>A dashboard for live conditions at your pin</li>
+          <li>High-resolution weather radar from NOAA NEXRAD</li>
+          <li>GOES satellite pictures from NOAA</li>
+          <li>Weather alerts from the National Weather Service (NWS)</li>
+          <li>A 10-day outlook that blends free public models through Open-Meteo, plus NWS / NOAA guidance</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Local first. Internet optional.</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>You have…</th>
+              <th>Open Weather can…</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A station, no internet</td>
+              <td>Show live local readings and keep history on your computer</td>
+            </tr>
+            <tr>
+              <td>Internet, no station</td>
+              <td>Show radar, satellite, alerts, and the 10-day outlook</td>
+            </tr>
+            <tr>
+              <td>Both</td>
+              <td>Combine your backyard numbers with the national picture</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          We do not upload your location history, station data, or personal information. Sharing, when it
+          arrives, will stay anonymous.
+        </p>
+      </section>
+
+      <section>
+        <h2>Build a station</h2>
+        <p>The long-term goal is a station anyone can make:</p>
+        <ul>
+          <li>Parts that are easy to find</li>
+          <li>3D-printed housings and mounts</li>
+          <li>Open firmware you can flash and change</li>
+          <li>Software that talks to the station on your own network</li>
+        </ul>
+        <p>
+          Hardware and print files are still coming back into this project. Outdoor print notes are in
+          <a href="https://github.com/NicholasTracy/Open-Weather/issues/1">Issue #1</a>
+          and the
+          <a href="https://docs.google.com/spreadsheets/d/1O-heHT2M7XdvT4qFRkZZBCX_Tv8IUrr2iZ7YO4e-dkw/edit?usp=sharing">filament spreadsheet</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2>Sharing, later — still private</h2>
+        <p>
+          On the roadmap is a network of home stations that can fill gaps for neighbors and for the outlook.
+          Stations will be able to share readings over the internet, LoRa mesh, and similar links. No names, no
+          accounts, no household data — only weather. That network is not built yet. The app is designed so it
+          never has to depend on it.
+        </p>
+      </section>
+
+      <footer>
+        Open Weather is free software under the
+        <a href="https://github.com/NicholasTracy/Open-Weather/blob/master/LICENSE">GNU GPLv3</a>.
+        Use it, share it, and improve it.
+      </footer>
+    </div>
+  </body>
+</html>
