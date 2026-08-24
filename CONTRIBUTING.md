@@ -57,6 +57,10 @@ git push origin v0.1.1
 
 GitHub Actions builds the Windows installer and publishes a [release](https://github.com/NicholasTracy/Open-Weather/releases). You can also run the **Release** workflow by hand.
 
+## Website
+
+The public site is `index.html` and `Media/`. Pages deploys only when those files or the Pages workflow change, not on every `master` commit. You can also run the **Pages** workflow by hand.
+
 ## Where to ask
 
 - [Troubleshooting](TROUBLESHOOTING.md)
