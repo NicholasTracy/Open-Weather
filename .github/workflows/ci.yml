@@ -3,7 +3,16 @@ name: CI
 on:
   push:
     branches: [master, development]
+    paths:
+      - software/**
+      - .github/workflows/ci.yml
+      - .github/workflows/release.yml
   pull_request:
+    paths:
+      - software/**
+      - .github/workflows/ci.yml
+      - .github/workflows/release.yml
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}

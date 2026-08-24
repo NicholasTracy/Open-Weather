@@ -22,7 +22,7 @@ Thanks for helping Open Weather stay free, local, and useful.
 
 4. Open a pull request. The template asks for a short “why” and how you checked the work.
 
-CI typechecks on every pull request, then packages the Command Center and installs it on Ubuntu, Windows, and macOS runners. Each install is launched with a `--smoke-test` flag so the window must load. macOS is ad-hoc signed on the runner (no Apple Developer certificate).
+CI runs when `software/` or the CI / release workflows change. It typechecks, then packages the Command Center and installs it on Ubuntu, Windows, and macOS runners. Docs, hardware, and media commits skip that matrix. Each install is launched with a `--smoke-test` flag so the window must load. macOS is ad-hoc signed on the runner (no Apple Developer certificate). You can also run the **CI** workflow by hand.
 
 If CI goes red, a triage job reads the failed logs and posts a likely cause plus first steps. Pull requests get one triage comment, updated on later failures. Pushes to `master` or `development` open a sticky **CI is failing on** issue for that branch, which closes when CI is green again.
 
