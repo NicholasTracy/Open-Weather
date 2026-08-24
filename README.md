@@ -11,12 +11,22 @@
 
 <p align="center">
   <a href="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml/badge.svg?branch=master" /></a>
+  &nbsp;
   <a href="https://github.com/NicholasTracy/Open-Weather/blob/master/software/package.json"><img alt="Version" src="https://img.shields.io/github/package-json/v/NicholasTracy/Open-Weather?filename=software/package.json&label=version" /></a>
+  &nbsp;
   <a href="https://github.com/NicholasTracy/Open-Weather/releases"><img alt="Release" src="https://img.shields.io/github/v/release/NicholasTracy/Open-Weather?include_prereleases&sort=semver&label=release" /></a>
+  <br /><br />
   <a href="https://github.com/NicholasTracy/Open-Weather/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/NicholasTracy/Open-Weather" /></a>
-  <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational" />
+  &nbsp;
   <img alt="Node.js" src="https://img.shields.io/badge/node-%3E%3D20-339933?logo=nodedotjs&logoColor=white" />
+  &nbsp;
   <a href="https://github.com/NicholasTracy/Open-Weather/issues"><img alt="Issues" src="https://img.shields.io/github/issues/NicholasTracy/Open-Weather" /></a>
+  <br /><br />
+  <img alt="Windows" src="https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white" />
+  &nbsp;
+  <img alt="macOS" src="https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white" />
+  &nbsp;
+  <img alt="Linux" src="https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black" />
 </p>
 
 Open Weather is a DIY weather project. Build a station from parts you can buy and print, run the software on your own computer, and keep a live picture of the weather right where you are.
