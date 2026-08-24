@@ -91,7 +91,7 @@ That network is not built yet. The app is designed so it never has to depend on 
 | [Troubleshooting](TROUBLESHOOTING.md) | App, radar, and installer fixes |
 | [Contributing](CONTRIBUTING.md) | How to send a change |
 | [Wiki](https://github.com/NicholasTracy/Open-Weather/wiki) | Guides and design rules |
-| [Releases](https://github.com/NicholasTracy/Open-Weather/releases) | Windows installer builds |
+| [Releases](https://github.com/NicholasTracy/Open-Weather/releases) | Windows, macOS, and Linux builds |
 
 ## Try the Command Center
 

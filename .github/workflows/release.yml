@@ -9,13 +9,44 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  windows:
-    name: Windows installer
-    runs-on: windows-latest
+  package:
+    name: Package (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows
+            os: windows-latest
+            builder: win
+            targets: nsis portable --x64
+            globs: |
+              software/release/*Setup.exe
+              software/release/*Portable.exe
+          - name: macos
+            os: macos-latest
+            builder: mac
+            targets: dmg zip
+            globs: |
+              software/release/*.dmg
+              software/release/*.zip
+          - name: linux
+            os: ubuntu-latest
+            builder: linux
+            targets: deb AppImage
+            globs: |
+              software/release/*.deb
+              software/release/*.AppImage
     defaults:
       run:
         working-directory: software
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: false
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -26,6 +57,18 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: software/package-lock.json
+
+      - name: Cache Electron downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: electron-${{ runner.os }}-${{ hashFiles('software/package-lock.json') }}
 
       - name: Install
         run: npm ci
@@ -40,25 +83,80 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Build installer
-        run: npm run dist:win
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: Upload installer
-        uses: actions/upload-artifact@v7
-        with:
-          name: windows-installer
-          path: software/release/*Setup.exe
-          if-no-files-found: error
-
-      - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build packages
         shell: bash
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            software/release/*Setup.exe \
-            --title "Open Weather Command Center ${GITHUB_REF_NAME}" \
-            --generate-notes
+          npm run build
+          npx electron-builder --${{ matrix.builder }} ${{ matrix.targets }} --publish never
+
+      - name: List packaged files
+        shell: bash
+        run: ls -la release
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.name }}-package
+          path: ${{ matrix.globs }}
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        working-directory: dist
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(*.exe *.dmg *.zip *.deb *.AppImage)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No installer or executable files were downloaded."
+            ls -la
+            exit 1
+          fi
+          sha256sum -- "${files[@]}" > SHA256SUMS.txt
+          echo "Attaching:"
+          printf '  %s\n' "${files[@]}" SHA256SUMS.txt
+
+          version="${TAG#v}"
+          extra=()
+          case "$version" in
+            *-* ) extra+=(--prerelease) ;;
+          esac
+
+          gh release create "$TAG" \
+            "${extra[@]}" \
+            --title "Open Weather Command Center ${version}" \
+            --generate-notes \
+            --notes "$(cat <<EOF
+          Beta packages for Windows, macOS (Apple Silicon), and Linux.
+
+          Builds are **not code-signed**. Windows SmartScreen may warn; choose More info, then Run anyway. macOS is not notarized — after copying the app out of the disk image:
+
+          \`\`\`bash
+          xattr -cr "/Applications/Open Weather Command Center.app"
+          codesign --force --deep --sign - "/Applications/Open Weather Command Center.app"
+          \`\`\`
+
+          Then open it from Finder (right-click, Open) the first time. See TROUBLESHOOTING.md.
+
+          **Files**
+          - Windows: NSIS \`Setup.exe\` installer and \`Portable.exe\`
+          - macOS: \`.dmg\` and \`.zip\`
+          - Linux: \`.deb\` and \`.AppImage\`
+          EOF
+          )" \
+            "${files[@]}" \
+            SHA256SUMS.txt

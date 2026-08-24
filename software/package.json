@@ -1,6 +1,6 @@
 {
   "name": "open-weather-command-center",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "description": "Open Weather Station Command Center — cross-platform Electron dashboard",
   "main": "./out/main/index.js",
   "author": "Nicholas Tracy <nicholas.tracy@outlook.com>",
@@ -74,11 +74,12 @@
           ]
         }
       ],
-      "artifactName": "${productName} ${version} Setup.${ext}",
+      "artifactName": "${productName} ${version}.${ext}",
       "signAndEditExecutable": true,
       "signExecutable": false
     },
     "nsis": {
+      "artifactName": "${productName} ${version} Setup.${ext}",
       "oneClick": false,
       "perMachine": false,
       "allowElevation": true,
@@ -89,6 +90,9 @@
       "uninstallDisplayName": "Open Weather Command Center",
       "deleteAppDataOnUninstall": false,
       "license": "../LICENSE"
+    },
+    "portable": {
+      "artifactName": "${productName} ${version} Portable.${ext}"
     },
     "linux": {
       "executableName": "open-weather-command-center",

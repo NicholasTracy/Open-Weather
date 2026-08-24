@@ -51,11 +51,11 @@ To review one open Dependabot PR by hand-trigger: **Actions → Dependabot autom
 Maintainers cut a version by tagging `master`:
 
 ```bash
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.1.0-beta.1
+git push origin v0.1.0-beta.1
 ```
 
-GitHub Actions builds the Windows installer and publishes a [release](https://github.com/NicholasTracy/Open-Weather/releases). You can also run the **Release** workflow by hand.
+GitHub Actions builds Windows, macOS, and Linux packages and publishes a [release](https://github.com/NicholasTracy/Open-Weather/releases). Tags with a hyphen (like `beta` or `rc`) are marked as prereleases. You can also run the **Release** workflow by hand to package without publishing.
 
 ## Website
 
