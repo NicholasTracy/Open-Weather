@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Open Weather Station Command Center — cross-platform Electron dashboard",
   "main": "./out/main/index.js",
-  "author": "Nicholas Tracy",
+  "author": "Nicholas Tracy <nicholas.tracy@outlook.com>",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/NicholasTracy/Open-Weather",
   "scripts": {

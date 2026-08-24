@@ -127,8 +127,10 @@ jobs:
               Select-Object -ExpandProperty FullName
             throw 'Installed Windows executable not found'
           }
-          & $exe --smoke-test
-          if ($LASTEXITCODE -ne 0) { throw "Smoke test exited $LASTEXITCODE" }
+          $smoke = Start-Process -FilePath $exe -ArgumentList '--smoke-test' -Wait -PassThru -NoNewWindow
+          if ($null -eq $smoke.ExitCode -or $smoke.ExitCode -ne 0) {
+            throw "Smoke test exited $($smoke.ExitCode)"
+          }
 
       - name: Install and smoke-test (macOS)
         if: runner.os == 'macOS'
