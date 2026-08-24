@@ -9,6 +9,16 @@
   Free, open source, and built to work even when the internet does not.
 </p>
 
+<p align="center">
+  <a href="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml/badge.svg?branch=master" /></a>
+  <a href="https://github.com/NicholasTracy/Open-Weather/blob/master/software/package.json"><img alt="Version" src="https://img.shields.io/github/package-json/v/NicholasTracy/Open-Weather?filename=software/package.json&label=version" /></a>
+  <a href="https://github.com/NicholasTracy/Open-Weather/releases"><img alt="Release" src="https://img.shields.io/github/v/release/NicholasTracy/Open-Weather?include_prereleases&sort=semver&label=release" /></a>
+  <a href="https://github.com/NicholasTracy/Open-Weather/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/NicholasTracy/Open-Weather" /></a>
+  <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational" />
+  <img alt="Node.js" src="https://img.shields.io/badge/node-%3E%3D20-339933?logo=nodedotjs&logoColor=white" />
+  <a href="https://github.com/NicholasTracy/Open-Weather/issues"><img alt="Issues" src="https://img.shields.io/github/issues/NicholasTracy/Open-Weather" /></a>
+</p>
+
 Open Weather is a DIY weather project. Build a station from parts you can buy and print, run the software on your own computer, and keep a live picture of the weather right where you are.
 
 Nothing is stored in someone else’s cloud. There is no account to create and no subscription to pay. When the network is down, your station and the app still work. When the network is up, we fill in the wider view from public government and research sources.
