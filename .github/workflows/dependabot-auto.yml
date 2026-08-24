@@ -1,0 +1,226 @@
+name: Dependabot automation
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Dependabot pull request number to review
+        required: true
+        type: string
+
+concurrency:
+  group: dependabot-auto
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  models: read
+  actions: read
+  checks: read
+
+jobs:
+  review-and-merge:
+    name: Review and merge
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.event == 'pull_request' &&
+       github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    outputs:
+      pr: ${{ steps.find.outputs.pr }}
+      merged: ${{ steps.merge.outputs.merged }}
+    steps:
+      - name: Find Dependabot pull request
+        id: find
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.eventName === 'workflow_dispatch') {
+              const number = context.payload.inputs.pr
+              const { data: pull } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: Number(number)
+              })
+              const login = pull.user?.login || ''
+              if (login !== 'dependabot[bot]') {
+                core.setOutput('pr', String(number))
+                core.setOutput('skip', '1')
+                return
+              }
+              core.setOutput('pr', String(number))
+              core.setOutput('skip', '0')
+              core.setOutput('title', pull.title)
+              core.setOutput('url', pull.html_url)
+              return
+            }
+            const run = context.payload.workflow_run
+            let number = run.pull_requests?.[0]?.number
+            if (!number && run.head_branch) {
+              const { data } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                head: `${context.repo.owner}:${run.head_branch}`
+              })
+              number = data[0]?.number
+            }
+            if (!number) {
+              core.setOutput('pr', '')
+              core.setOutput('skip', '1')
+              return
+            }
+            const { data: pull } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: number
+            })
+            const login = pull.user?.login || ''
+            if (login !== 'dependabot[bot]') {
+              core.setOutput('pr', String(number))
+              core.setOutput('skip', '1')
+              return
+            }
+            core.setOutput('pr', String(number))
+            core.setOutput('skip', '0')
+            core.setOutput('title', pull.title)
+            core.setOutput('url', pull.html_url)
+
+      - name: Check out
+        if: steps.find.outputs.skip == '0'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        if: steps.find.outputs.skip == '0'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: AI and safety review
+        id: review
+        if: steps.find.outputs.skip == '0'
+        env:
+          PR_NUMBER: ${{ steps.find.outputs.pr }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node .github/scripts/dependabot-auto.mjs
+
+      - name: Hold for a human
+        if: steps.find.outputs.skip == '0' && steps.review.outputs.decision == 'BLOCK'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.find.outputs.pr }}
+          REASON: ${{ steps.review.outputs.reason }}
+        run: |
+          gh pr comment "$PR" --body "Automation held this Dependabot PR for a human.
+
+          **Why:** $REASON
+
+          CI was green, but the AI / safety review did not approve an automatic merge."
+          gh pr edit "$PR" --add-label "needs-human-review"
+
+      - name: Approve and merge
+        id: merge
+        if: steps.find.outputs.skip == '0' && steps.review.outputs.decision == 'APPROVE'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.find.outputs.pr }}
+          TITLE: ${{ steps.find.outputs.title }}
+          REASON: ${{ steps.review.outputs.reason }}
+        run: |
+          gh pr review "$PR" --approve --body "AI review approved this Dependabot update.
+
+          $REASON"
+          gh pr merge "$PR" --squash --delete-branch \
+            --subject "$TITLE" \
+            --body "Auto-merged-by: dependabot-automation
+
+          AI review: $REASON"
+          echo "merged=1" >> "$GITHUB_OUTPUT"
+
+      - name: Post-merge CI
+        id: postci
+        if: steps.merge.outputs.merged == '1'
+        run: |
+          git fetch origin master
+          git checkout --force -B master origin/master
+          cd software
+          npm ci
+          npm run typecheck
+          echo "ok=1" >> "$GITHUB_OUTPUT"
+
+      - name: Roll back failed merge
+        if: failure() && steps.merge.outputs.merged == '1' && steps.postci.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.find.outputs.pr }}
+          TITLE: ${{ steps.find.outputs.title }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin master
+          git checkout --force -B master origin/master
+          SHA="$(git log -1 --pretty=%H)"
+          SUBJECT="$(git log -1 --pretty=%s)"
+          BODY="$(git log -1 --pretty=%b)"
+          if ! echo "$BODY" | grep -q "Auto-merged-by: dependabot-automation"; then
+            echo "Latest master commit is not the automated merge; not reverting."
+            gh issue create \
+              --title "Post-merge CI failed after Dependabot #$PR" \
+              --label "needs-human-review,dependencies,bug" \
+              --body "Post-merge typecheck failed after merging [$TITLE](https://github.com/${{ github.repository }}/pull/$PR), but the tip of master no longer looks like that merge. A human needs to check \`master\`.
+
+          Head: \`$SHA\` — $SUBJECT"
+            exit 1
+          fi
+          git revert --no-edit "$SHA"
+          git push origin master
+          gh pr comment "$PR" --body "Merged, then **post-merge CI failed**. The merge was reverted. Flagged for a human."
+          gh pr edit "$PR" --add-label "needs-human-review"
+          gh issue create \
+            --title "Rolled back Dependabot merge: $TITLE" \
+            --label "needs-human-review,dependencies,bug" \
+            --body "Automation merged [#$PR](https://github.com/${{ github.repository }}/pull/$PR) after a green PR CI and an AI approve, then typecheck failed on \`master\`.
+
+          The merge commit \`$SHA\` was reverted. Please review by hand before trying again."
+
+  rollback-master:
+    name: Roll back red master
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'master' && github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+          ref: master
+
+      - name: Revert automated Dependabot merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SHA="$(git log -1 --pretty=%H)"
+          SUBJECT="$(git log -1 --pretty=%s)"
+          BODY="$(git log -1 --pretty=%b)"
+          if ! echo "$BODY" | grep -q "Auto-merged-by: dependabot-automation"; then
+            echo "Failed master CI is not from Dependabot automation; leaving it for a human."
+            exit 0
+          fi
+          git revert --no-edit "$SHA"
+          git push origin master
+          gh issue create \
+            --title "Rolled back Dependabot merge: $SUBJECT" \
+            --label "needs-human-review,dependencies,bug" \
+            --body "CI failed on \`master\` after an automated Dependabot merge.
+
+          Reverted \`$SHA\`. Please review by hand."

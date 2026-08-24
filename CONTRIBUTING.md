@@ -32,6 +32,18 @@ CI runs a TypeScript check on every pull request. Path labels are applied automa
 - Do not commit `node_modules/`, `software/release/`, `.env` files, or local Cursor config.
 - Hardware and print files belong in `3D Printed Parts/` and `Boards/` when they are ready.
 
+## Dependabot
+
+Dependabot opens monthly update PRs. Automation then:
+
+1. Waits until CI is green
+2. Runs an AI / safety review (manifest files only; majors of Electron, TypeScript, Vite, and Actions stay with a human)
+3. Approves and squash-merges if that review says the update is safe
+4. Runs typecheck again on `master`
+5. Reverts the merge and opens a **needs-human-review** issue if that second check fails
+
+To review one open Dependabot PR by hand-trigger: **Actions → Dependabot automation → Run workflow**.
+
 ## Releases
 
 Maintainers cut a version by tagging `master`:
