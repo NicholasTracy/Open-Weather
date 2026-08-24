@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml/badge.svg?branch=master" /></a>
+  <a href="https://github.com/NicholasTracy/Open-Weather/actions/workflows/ci.yml?query=branch%3Amaster"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/NicholasTracy/Open-Weather/ci.yml?branch=master&event=push&label=CI" /></a>
   &nbsp;
   <a href="https://github.com/NicholasTracy/Open-Weather/blob/master/software/package.json"><img alt="Version" src="https://img.shields.io/github/package-json/v/NicholasTracy/Open-Weather?filename=software/package.json&label=version" /></a>
   &nbsp;
