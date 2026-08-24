@@ -32,3 +32,124 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+  install-and-run:
+    name: Install and run (${{ matrix.os }})
+    needs: typecheck
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: software
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: software/package-lock.json
+
+      - name: Cache Electron downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: electron-${{ runner.os }}-${{ hashFiles('software/package-lock.json') }}
+
+      - name: Install
+        run: npm ci
+
+      - name: Build Linux package
+        if: runner.os == 'Linux'
+        run: npm run dist:linux
+
+      - name: Build Windows installer
+        if: runner.os == 'Windows'
+        run: npm run dist:win
+
+      - name: Build macOS disk image
+        if: runner.os == 'macOS'
+        run: npm run dist:mac
+
+      - name: List packaged files
+        run: ls -la release
+        shell: bash
+
+      - name: Install and smoke-test (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y xvfb dbus-x11
+          deb="$(ls release/*.deb | head -n 1)"
+          test -n "$deb"
+          sudo apt-get install -y "./$deb"
+          bin="/opt/Open Weather Command Center/open-weather-command-center"
+          if [ ! -x "$bin" ]; then
+            echo "Expected binary missing; listing package files:"
+            dpkg -L open-weather-command-center
+            exit 1
+          fi
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24" \
+            dbus-run-session -- "$bin" --smoke-test
+
+      - name: Install and smoke-test (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $setup = Get-ChildItem -Path release -Filter '*Setup.exe' | Select-Object -First 1
+          if (-not $setup) { throw 'Windows installer not found in release/' }
+          $installDir = 'C:\ow-ci'
+          $proc = Start-Process -FilePath $setup.FullName -ArgumentList '/S', "/D=$installDir" -PassThru -Wait
+          if ($proc.ExitCode -ne 0) { throw "Installer exited $($proc.ExitCode)" }
+          $exe = Join-Path $installDir 'Open Weather Command Center.exe'
+          if (-not (Test-Path $exe)) {
+            $fallback = Join-Path $env:LOCALAPPDATA 'Programs\Open Weather Command Center\Open Weather Command Center.exe'
+            if (Test-Path $fallback) { $exe = $fallback }
+          }
+          if (-not (Test-Path $exe)) {
+            Get-ChildItem -Path $installDir, "$env:LOCALAPPDATA\Programs" -Recurse -ErrorAction SilentlyContinue |
+              Select-Object -ExpandProperty FullName
+            throw 'Installed Windows executable not found'
+          }
+          & $exe --smoke-test
+          if ($LASTEXITCODE -ne 0) { throw "Smoke test exited $LASTEXITCODE" }
+
+      - name: Install and smoke-test (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          set -euo pipefail
+          dmg="$(ls release/*.dmg | head -n 1)"
+          test -n "$dmg"
+          mount="/tmp/ow-dmg"
+          mkdir -p "$mount"
+          hdiutil attach -nobrowse -readonly -mountpoint "$mount" "$dmg"
+          app_src="$(find "$mount" -maxdepth 1 -name '*.app' | head -n 1)"
+          test -n "$app_src"
+          mkdir -p "$HOME/Applications"
+          app_dest="$HOME/Applications/$(basename "$app_src")"
+          rm -rf "$app_dest"
+          ditto "$app_src" "$app_dest"
+          hdiutil detach "$mount"
+          # No Apple Developer certificate: strip quarantine and ad-hoc sign so
+          # Apple Silicon will launch the copied .app.
+          xattr -cr "$app_dest" || true
+          codesign --force --deep --sign - "$app_dest"
+          bin="$app_dest/Contents/MacOS/Open Weather Command Center"
+          test -x "$bin"
+          "$bin" --smoke-test

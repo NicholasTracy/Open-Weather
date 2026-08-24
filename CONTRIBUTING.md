@@ -22,7 +22,9 @@ Thanks for helping Open Weather stay free, local, and useful.
 
 4. Open a pull request. The template asks for a short “why” and how you checked the work.
 
-CI runs a TypeScript check on every pull request. Path labels are applied automatically.
+CI typechecks on every pull request, then packages the Command Center and installs it on Ubuntu, Windows, and macOS runners. Each install is launched with a `--smoke-test` flag so the window must load. macOS is ad-hoc signed on the runner (no Apple Developer certificate).
+
+If CI goes red, a triage job reads the failed logs and posts a likely cause plus first steps. Pull requests get one triage comment, updated on later failures. Pushes to `master` or `development` open a sticky **CI is failing on** issue for that branch, which closes when CI is green again.
 
 ## Project guidelines
 

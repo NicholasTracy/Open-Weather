@@ -8,6 +8,8 @@ import {
   shell,
   type MenuItemConstructorOptions
 } from 'electron'
+import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import {
   DEFAULT_CDP_PORT,
@@ -35,8 +37,25 @@ import {
   type WindowPlacement
 } from './windowStateStorage'
 
+function isSmokeTest(): boolean {
+  return process.argv.includes('--smoke-test') || process.env.OW_SMOKE_TEST === '1'
+}
+
+if (isSmokeTest()) {
+  const smokeUserData = path.join(os.tmpdir(), 'open-weather-smoke-test')
+  fs.mkdirSync(smokeUserData, { recursive: true })
+  app.setPath('userData', smokeUserData)
+  app.disableHardwareAcceleration()
+  app.commandLine.appendSwitch('disable-gpu')
+  if (process.platform === 'linux') {
+    app.commandLine.appendSwitch('no-sandbox')
+    app.commandLine.appendSwitch('disable-dev-shm-usage')
+  }
+}
+
 // CDP must be set before ready so Cursor / chrome tooling can attach.
 function agentToolsWanted(): boolean {
+  if (isSmokeTest()) return false
   if (process.env.OW_AGENT_BRIDGE === '0') return false
   if (process.env.OW_AGENT_BRIDGE === '1') return true
   return !app.isPackaged
@@ -241,13 +260,19 @@ function createAppWindow({
     }
   })
 
+  if (isSmokeTest() && isMain) {
+    armSmokeTest(window)
+  }
+
   void window.loadURL(resolveRendererUrl(defaultPage))
 
   window.on('ready-to-show', () => {
-    if (initialPlacement?.isFullScreen) {
-      window.setFullScreen(true)
-    } else if (initialPlacement?.isMaximized) {
-      window.maximize()
+    if (!isSmokeTest()) {
+      if (initialPlacement?.isFullScreen) {
+        window.setFullScreen(true)
+      } else if (initialPlacement?.isMaximized) {
+        window.maximize()
+      }
     }
     window.show()
   })
@@ -260,7 +285,7 @@ function createAppWindow({
   const webContentsId = window.webContents.id
 
   const persistBounds = (): void => {
-    if (isClosing || window.isDestroyed()) return
+    if (isSmokeTest() || isClosing || window.isDestroyed()) return
     if (isMain) {
       const placement = captureWindowPlacementSafe(window)
       if (placement === null) return
@@ -713,8 +738,44 @@ app.on('child-process-gone', (_event, details) => {
   }
 })
 
+function armSmokeTest(window: BrowserWindow): void {
+  const deadline = setTimeout(() => {
+    console.error('[smoke-test] timed out waiting for the window to load')
+    app.exit(1)
+  }, 60_000)
+
+  let shown = false
+  let loaded = false
+  const tryPass = (): void => {
+    if (!shown || !loaded) return
+    clearTimeout(deadline)
+    console.log('[smoke-test] window ready')
+    setTimeout(() => app.exit(0), 500)
+  }
+
+  window.once('ready-to-show', () => {
+    shown = true
+    tryPass()
+  })
+  window.webContents.once('did-finish-load', () => {
+    loaded = true
+    tryPass()
+  })
+  window.webContents.once('did-fail-load', (_event, code, description, url) => {
+    if (code === -3) return
+    clearTimeout(deadline)
+    console.error('[smoke-test] page failed to load', code, description, url)
+    app.exit(1)
+  })
+  window.webContents.once('render-process-gone', (_event, details) => {
+    clearTimeout(deadline)
+    console.error('[smoke-test] renderer process gone', details.reason)
+    app.exit(1)
+  })
+}
+
 app.whenReady().then(async () => {
-  persistedWindowLayout = readWindowLayout()
+  persistedWindowLayout = isSmokeTest() ? initWindowLayout() : readWindowLayout()
   for (const entry of persistedWindowLayout.detached) {
     const { page, ...placement } = entry
     lastDetachedPlacements.set(page, placement)
@@ -727,6 +788,10 @@ app.whenReady().then(async () => {
     defaultPage: 'Dashboard',
     initialPlacement: persistedWindowLayout.main
   })
+
+  if (isSmokeTest()) {
+    return
+  }
 
   restoreDetachedWindows()
 
@@ -773,6 +838,7 @@ app.whenReady().then(async () => {
 app.on('before-quit', () => {
   isClosing = true
   void stopAgentBridge()
+  if (isSmokeTest()) return
   if (mainWindow && !mainWindow.isDestroyed()) {
     const placement = captureWindowPlacementSafe(mainWindow)
     if (placement !== null) {

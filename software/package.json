@@ -11,9 +11,11 @@
     "dev:agent": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win nsis --x64",
+    "pack": "npm run build && electron-builder --dir --publish never",
+    "dist": "npm run build && electron-builder --publish never",
+    "dist:win": "npm run build && electron-builder --win nsis --x64 --publish never",
+    "dist:mac": "npm run build && electron-builder --mac dmg --publish never",
+    "dist:linux": "npm run build && electron-builder --linux deb --publish never",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "agent:mcp": "node ./agent/mcp-server.mjs"
   },
@@ -56,7 +58,11 @@
         "dmg",
         "zip"
       ],
-      "category": "public.app-category.weather"
+      "category": "public.app-category.weather",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "notarize": false
     },
     "win": {
       "icon": "icon.png",
@@ -85,6 +91,7 @@
       "license": "../LICENSE"
     },
     "linux": {
+      "executableName": "open-weather-command-center",
       "target": [
         "AppImage",
         "deb"

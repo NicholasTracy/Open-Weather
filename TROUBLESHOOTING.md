@@ -44,6 +44,24 @@ npm run dist:win
 
 The file lands in `software/release/`.
 
+## macOS says the app is damaged or cannot be opened
+
+Release builds are not signed with an Apple Developer certificate. After you copy the app out of the disk image:
+
+```bash
+xattr -cr "/Applications/Open Weather Command Center.app"
+codesign --force --deep --sign - "/Applications/Open Weather Command Center.app"
+```
+
+Then open it from Finder (right-click, Open) the first time.
+
+Rebuild it yourself with:
+
+```bash
+cd software
+npm run dist:mac
+```
+
 ## `npm run dist:win` fails with a file lock
 
 Close the running app, then delete `software/release` and build again. On a busy folder (editor indexing, antivirus) the first unpack can fail. A second run usually works.

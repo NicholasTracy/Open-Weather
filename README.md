@@ -101,11 +101,13 @@ npm install
 npm run dev
 ```
 
-To package a Windows installer:
+To package an installer:
 
 ```bash
 cd software
-npm run dist:win
+npm run dist:win    # Windows NSIS
+npm run dist:mac    # macOS disk image (unsigned / ad-hoc)
+npm run dist:linux  # Debian package
 ```
 
 ## In this repository
